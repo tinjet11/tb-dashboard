@@ -22,6 +22,8 @@ import {
 import { useAuthStore } from "@/store/authStore";
 import { useEffect } from "react";
 import { useHospitalStore } from "@/store/hospitalStore";
+import { ID } from "appwrite";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -31,7 +33,7 @@ const formSchema = z.object({
 });
 
 export function StaffRegisterForm() {
-  const { registerStaffAndSetPrefs } = useAuthStore();
+  const { sendPasswordResetEmail } = useAuthStore();
   const { hospitals, fetchHospitals, error } = useHospitalStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,13 +59,80 @@ export function StaffRegisterForm() {
     return password;
   }
 
+  const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID;
+  const apiKey = import.meta.env.VITE_APPWRITE_API_KEY;
+
+  function updateUserPrefs(userId: string, values: z.infer<typeof formSchema>) {
+    const prefs = {
+      role: values.role, // Set user role as a preference
+      hospital: values.hospital,
+    };
+
+    fetch(`https://cloud.appwrite.io/v1/users/${userId}/prefs`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Appwrite-Response-Format": "1.6.0",
+        "X-Appwrite-Project": projectId,
+        "X-Appwrite-Key": apiKey,
+      },
+      body: JSON.stringify({ prefs }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            "Network response was not ok: " + response.statusText
+          );
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("User preferences updated:", data);
+        if(data.code){
+          toast.error(data.message);
+        }
+        sendPasswordResetEmail(values.email);
+      })
+      .catch((error) => {
+        console.error("Error updating user preferences:", error);
+      });
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      const email = values.email;
       const password = generateSecurePassword(12);
-      registerStaffAndSetPrefs({
-        ...values, // Spread all properties of values
-        password, // Add the generated password
-      });
+      const userId = ID.unique();
+      const name = values.name;
+
+      const body = {
+        userId: userId,
+        email: email,
+        password: password,
+        name: name,
+      };
+
+      await fetch("https://cloud.appwrite.io/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Appwrite-Response-Format": "1.6.0",
+          "X-Appwrite-Project": projectId,
+          "X-Appwrite-Key": apiKey,
+        },
+        body: JSON.stringify(body),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Success:", data);
+          if(data.code){
+            toast.error(data.message);
+          }
+          updateUserPrefs(userId, values);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     } catch (error) {
       console.error("Account Creation Failed:", error);
     }

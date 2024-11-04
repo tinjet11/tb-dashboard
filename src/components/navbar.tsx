@@ -46,7 +46,7 @@ export default function Navbar() {
               <a href="/contact" className="text-gray-700 hover:text-gray-900">
                 Patient
               </a>
-              {user.prefs?.role == "Doctor" &&
+              {user.prefs?.role == "Admin" &&
               <a href="/register" className="text-gray-700 hover:text-gray-900">
                 Register
               </a>

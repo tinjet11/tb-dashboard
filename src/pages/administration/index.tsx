@@ -19,7 +19,7 @@ function Home() {
           },
           // Additional data here
         ]);
-      }, 2000); // 2-second delay
+      }, 500); // 2-second delay
     });
   }
 

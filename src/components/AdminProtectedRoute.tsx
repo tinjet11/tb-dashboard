@@ -19,7 +19,7 @@ export default function AdminProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   // Redirect to forbidden if the user is authenticated but not an admin
-  if (user && user.prefs?.role !== "Doctor") {
+  if (user && user.prefs?.role !== "Admin") {
     return <Navigate to="/forbidden" />;
   }
 

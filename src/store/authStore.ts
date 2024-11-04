@@ -10,14 +10,6 @@ const client = new Client()
   .setProject(import.meta.env.VITE_APPWRITE_PROJECT_ID);
 
 const account = new Account(client);
-type RegisterStaffValues = {
-    email: string;
-    name: string;
-    password: string;
-    role: string;
-    hospital: string;
-  };
-
 interface AuthState {
   user: any;
   isLoading: boolean;
@@ -32,7 +24,6 @@ interface AuthState {
     newPassword: string
   ) => Promise<boolean>;
   sendPasswordResetEmail: (email: string) => Promise<void>;
-  registerStaffAndSetPrefs: (values: RegisterStaffValues) => Promise<void>
 }
 
 // Create Zustand store with persist middleware
@@ -41,7 +32,7 @@ export const useAuthStore = create(
     (set) => ({
       user: null,
       prefs: null,
-      isLoading: true,
+      isLoading: false,
       isLoginLoading: false,
 
       checkAuthStatus: async () => {
@@ -121,45 +112,6 @@ export const useAuthStore = create(
         } catch (error) {
           console.error("Error sending password reset email:", error);
           toast.error("Failed to send password reset email.");
-        }
-      },
-
-      registerStaffAndSetPrefs: async (values: {
-        email: string;
-        name: string;
-        password: string;
-        role: string;
-        hospital: string;
-      }) => {
-        try {
-          const newUser = await account.create(
-            ID.unique(), // userId
-            values.email,
-            values.password,
-            values.name
-          );
-          console.log("Account creation successful:", newUser);
-
-          // Authenticate the newly created user
-          const $session = await account.createEmailPasswordSession(
-            values.email,
-            values.password
-          ); // Replace with actual password if applicable
-
-          // Update user preferences
-          const preferences = await account.updatePrefs({
-            role: values.role, // Set user role as a preference
-            hospital: values.hospital,
-          });
-
-          console.log("Preferences updated:", preferences);
-
-          // Delete the session to log out the user
-          await account.deleteSession($session.$id);
-          console.log("Session deleted after updating preferences");
-          await useAuthStore.getState().sendPasswordResetEmail(values.email);
-        } catch (error) {
-          console.error("Account Creation Failed:", error);
         }
       },
     }),
