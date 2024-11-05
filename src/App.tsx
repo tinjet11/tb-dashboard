@@ -13,12 +13,13 @@ import PasswordRecovery from "./pages/passwordRecovery/PasswordRecoveryForm";
 import Unauthorized from "./pages/errorPage/Unauthorized";
 import Navbar from "./components/Navbar";
 import Forbidden from "./pages/errorPage/Forbidden";
+import { PatientRegisterForm } from "./pages/patientRegistration";
 
 function App() {
   return (
     <>
       <Toaster />
-    <Navbar /> 
+      <Navbar />
       <Routes>
         {/* Protected Routes */}
         <Route
@@ -32,9 +33,18 @@ function App() {
         <Route
           path="/register"
           element={
-          //   <AdminProtectedRoute>
-            <StaffRegisterForm />
-            //</AdminProtectedRoute>
+            <AdminProtectedRoute>
+              <StaffRegisterForm />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/register-patient"
+          element={
+            <ProtectedRoute>
+              <PatientRegisterForm />
+            </ProtectedRoute>
           }
         />
 
@@ -51,7 +61,7 @@ function App() {
         <Route path="/login" element={<StaffLoginForm />} />
         <Route path="/recover-password" element={<PasswordRecovery />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
-        <Route path="/forbidden" element={<Forbidden/>}/>
+        <Route path="/forbidden" element={<Forbidden />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
