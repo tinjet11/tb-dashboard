@@ -90,6 +90,8 @@ export function StaffRegisterForm() {
         console.log("User preferences updated:", data);
         if(data.code){
           toast.error(data.message);
+        }else{
+          toast.success("Account Created");
         }
         sendPasswordResetEmail(values.email);
       })
@@ -135,6 +137,8 @@ export function StaffRegisterForm() {
         });
     } catch (error) {
       console.error("Account Creation Failed:", error);
+    }finally{
+      form.control._reset();
     }
   }
 
