@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Mail, Lock } from "lucide-react"; // Adjust icon import
 
-import { ForgetPasswordDialog } from "./ForgetPasswordDialog";
+import { ForgetPasswordDialog } from "../auth/ForgetPasswordDialog";
 import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useNavigate } from "react-router-dom";

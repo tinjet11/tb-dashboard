@@ -1,7 +1,7 @@
 // src/pages/ProfilePage.tsx
 import React, { useEffect, useState } from "react";
 
-import { PasswordChangeDialog } from "./PasswordChangeDialog";
+import { PasswordChangeDialog } from "../auth/PasswordChangeDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/store/authStore";
 import { useHospitalStore } from "@/store/hospitalStore";
